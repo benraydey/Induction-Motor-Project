@@ -3,9 +3,9 @@ disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 disp('Energy Efficient (EE) Motor parameters')
 disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
  
-f=50;                    %Supply frequency [Hz]
+f=60;                    %Supply frequency [Hz]
 p=4;                     %Number of poles
-V1=380/sqrt(3);          %Supply voltage [phase]
+V1=240/sqrt(3);          %Supply voltage [phase]
 R1_ee = 1.5;             %Stator winding resistance [ohms/phase]
 X1_ee = 3.642;           %Stator winding leakage reactance [ohms/phase]
 Xm_ee = 72.252;          %Stator winding magnetising reactance [ohms/phase]
@@ -71,7 +71,7 @@ fprintf('Xth=%f\n',Xth_se);
 
 %%
 disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-disp('QUESTION 2:Torque versus speed characteristics for EE and SE Motors:')
+disp('QUESTION 2:Torque versus speed characteristics for EE Motor:')
 disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 
 ns=120*f/p;         %Synchronous speed [rpm]
@@ -128,7 +128,7 @@ disp(['The maximum torque is dependent of the the Thevenin equivalent voltage Vt
     'be increased by increasing Vth and decreased by decreasing Vth'])
 %%
 % Caculate speed (in rpm) at which maximum torque occurs for the machines
-disp('(c) Speed at which maximum torque occurs')
+disp('(c) Speed at maximum torque');
 
 % EE motor
 s_Tmax_ee = R2p_ee/sqrt(Rth_ee^2 + (Xth_ee + X2p_ee)^2)
@@ -144,12 +144,6 @@ fprintf('Speed at maximum torque of SE motor = %f rpm\n',n_Tmax_se);
 
 %%
 % Stator current vs. speed characteristics of machines
-disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-disp('QUESTION 3:Stator current versus speed characteristicc of EE and SE Motors:')
-disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-
-
-Tmech_se = 3/ws*Vth_se^2./((Rth_se+R2p_se./s).^2+(Xth_se+X2p_se)^2).*R2p_se./s;
 
 % EE motor
 Z1_ee = R1_ee + 1i*X1_ee + 1i*Xm_ee*(R2p_ee./s+1i*X2p_ee)./(R2p_ee./s+1i*(Xm_ee+X2p_ee))
@@ -176,27 +170,34 @@ fprintf('Stator current of Energy Efficient machine at startup = %f A',abs(I1_ee
 % SE motor
 fprintf('Stator current of Standard machine at startup = %f A',abs(I1_se(2000)))
 %%
-% b) Stator current - no load and full load conditions
-disp('(a) Explain how the stator current at start-up would change when the machine is started under no-load and full-load conditions?')
-disp(['Stator current would be at a maximum under full load condtions and at a minimum and no load conditions.'])
-%%
 % (c) Stator currents when the machines develop maximum torque
 disp('(c) Stator currents when the machines develop maximum torque')
 
 % EE motor
-Z1_sTmax_ee = R1_ee + 1i*X1_ee + 1i*Xm_ee*(R2p_ee./s_Tmax_ee+1i*X2p_ee)./(R2p_ee./s_Tmax_ee+1i*(Xm_ee+X2p_ee))
-I1_sTmax_ee = V1./Z1_sTmax_ee
+Z1_sTmax_ee = R1_ee + 1i*X1_ee + 1i*Xm_ee*(R2p_ee/s_Tmax_ee+1i*X2p_ee)/(R2p_ee/s_Tmax_ee+1i*(Xm_ee+X2p_ee))
+I1_sTmax_ee = V1/Z1_sTmax_ee
 fprintf('Stator current of Energy Efficient machine at max torque = %f A',abs(I1_sTmax_ee))
 
 % SE motor
-Z1_sTmax_se = R1_se + 1i*X1_se + 1i*Xm_se*(R2p_se./s_Tmax_se+1i*X2p_se)./(R2p_se./s_Tmax_se+1i*(Xm_se+X2p_se))
-I1_sTmax_se = V1./Z1_sTmax_se
+Z1_sTmax_se = R1_se + 1i*X1_se + 1i*Xm_se*(R2p_se/s_Tmax_se+1i*X2p_se)/(R2p_se/s_Tmax_se+1i*(Xm_se+X2p_se))
+I1_sTmax_se = V1/Z1_sTmax_se
 fprintf('Stator current of Standard machine at max torque = %f A',abs(I1_sTmax_se))
 %%
 % (d) Stator current when the machines are operating under no-load conditions
+
+% when machine has no load, it will operate at synchronous speed. Thus, the
+% no-load stator current can be calculated as the stator current when slip
+% s = 0
+
 disp('(d) Stator current when the machines are operating under no-load conditions')
 
+% EE motor
+I1_NL_ee = abs(I1_ee(1));
+fprintf('Stator current of Energy Efficient machine operating under no-load conditions = %f A',I1_NL_ee);
 
+% SE motor
+I1_NL_se = abs(I1_se(1));
+fprintf('Stator current of Standard machine operating under no-load conditions = %f A',I1_NL_se);
 %%
 % 4. Power factor vs. speed characteristic of machines
 
@@ -215,55 +216,100 @@ plot(n,abs(PF_se))
 hold off
 %%
 % (a) Power factors at startup
-
-PF_startup_ee = PF_ee(2000)
-PF_startup_se = PF_se(2000)
-
-fprintf('Power factor at startup of EE motor = %f \n',PF_startup_ee);
-fprintf('Power factor at startup of SE motor = %f \n',PF_startup_se);
-
 %%
 % (b) Power factors when the machines develop maximum torque
-
-
-
-PF_Tmax_ee = cos(angle(I1_sTmax_ee))
-PF_Tmax_se = cos(angle(I1_sTmax_se))
-
-fprintf('Power factor at maximum torque of EE motor = %f \n',PF_Tmax_ee);
-fprintf('Power factor at maximum torque of SE motor = %f \n',PF_Tmax_se);
 %%
 % (c) Power factor when the machines are operating under no-load conditions
-
-PF_noload_ee = PF_ee(1)
-PF_noload_se = PF_se(1)
-
-fprintf('Power factor at no load of EE motor = %f \n',PF_noload_ee);
-fprintf('Power factor at no load of SE motor = %f \n',PF_noload_se);
-
 %%
 % (d) Determine the best power factors that these machines can operate at
-
-PF_best_ee = max(PF_ee)
-PF_best_se = max(PF_se)
-
-fprintf('Best power factor for EE motor = %f \n',PF_best_ee);
-fprintf('Best power factor for SE motor = %f \n',PF_best_se);
 %%
 % (e) Determine the speeds (in rpm) at which the best power factors occur
+%%
+% 5. Plot total input power,
+%               stator copper losses,
+%               air gap power,
+%               rotor copper losses and
+%               shaft power
+%                               vs speed, on the same set of axis
+% *Rotational losses of machines are negligable
+% *Seperate plots for each machine
 
-pos_PF_best_ee = find(PF_ee == max(PF_ee))
-n_best_ee = n(pos_PF_best_ee)
+disp('5. Power and losses plots of machines');
 
-pos_PF_best_se = find(PF_se == max(PF_se))
-n_best_se = n(pos_PF_best_se)
+% EE motor
+I2p_ee = Vth_ee./(Rth_ee+R2p_ee./s+1i*(Xth_ee+X2p_ee));      % Rotor current referred to primary
 
-fprintf('Speed at which best power factor occurs for EE motor = %f \n',n_best_ee);
-fprintf('Speed at which best power factor occurs for SE motor = %f \n',n_best_se);
+P1cu_ee = 3*I1_ee.^2*R1_ee;         % stator copper loss
+Pag_ee = 3*I2p_ee.^2*R2p_ee./s;     % air gap power
+P2cu_ee = 3*I2p_ee.^2*R2p_ee;       % rotor copper loss
+Pshaft_ee = (1-s).*Pag_ee;          % shaft power Pshaft = Pmech since Prot is negligable
+%Pin_ee = Pshaft_ee+P1cu_ee+P2cu_ee;            % total input power = Pag + P1cu
+Pin_ee = 3*V1*I1_ee;
+
+% generate plots of powers and losses
+plot(n,abs(Pin_ee),n,abs(Pag_ee),n,abs(Pshaft_ee),n,abs(P1cu_ee),n,abs(P2cu_ee),'linewidth',2),xlabel('n [rpm]'),ylabel('Power [W]'),...
+    title('Total input power, stator copper loss, air gap power, rotor copper loss and shaft power vs speed for Energy Efficient motor'),grid on,...
+legend({'Total input power','Air gap power','Shaft power','Stator copper loss','Rotor copper loss'},'Location','best');
+
+
+% SE motor
+I2p_se = Vth_se./(Rth_se+R2p_se./s+1i*(Xth_se+X2p_se));      % Rotor current referred to primary
+
+P1cu_se = 3*I1_se.^2*R1_se;         % stator copper loss
+Pag_se = 3*I2p_se.^2*R2p_se./s;     % air gap power
+P2cu_se = 3*I2p_se.^2*R2p_se;       % rotor copper loss
+Pshaft_se = (1-s).*Pag_se;          % shaft power Pshaft = Pmech since Prot is negligable
+%Pin_se = Pag_se+P1cu_se;            % total input power = Pag + P1cu
+Pin_se = 3*V1*I1_se;
+
+% generate plots of powers and losses
+plot(n,abs(Pin_se),n,abs(Pag_se),n,abs(Pshaft_se),n,abs(P1cu_se),n,abs(P2cu_se),'linewidth',2),xlabel('n [rpm]'),ylabel('Power [W]'),...
+    title('Total input power, stator copper loss, air gap power, rotor copper loss and shaft power vs speed for Standard motor'),grid on,...
+legend({'Total input power','Air gap power','Shaft power','Stator copper loss','Rotor copper loss'},'Location','best');
+%%
+% 5. (a) Stator and rotor copper losses at start up
+disp('(a) Stator and rotor copper losses at start up');
+
+% EE motor
+fprintf('Stator copper loss of Energy Efficient motor at startup = %f W',abs(P1cu_ee(2000)));
+fprintf('Rotor copper loss of Energy Efficient motor at startup = %f W',abs(P2cu_ee(2000)));
+
+% SE motor
+fprintf('Stator copper loss of Standard motor at startup = %f W',abs(P1cu_se(2000)));
+fprintf('Rotor copper loss of Standard motor at startup = %f W',abs(P2cu_se(2000)));
+%%
+% 5. (b) Stator and rotor copper losses under no-load conditions
+disp('(b) Stator and rotor copper losses under no-load conditions');
+
+% EE motor
+fprintf('Stator copper loss of Energy Efficient motor under no-load conditions = %f W',abs(P1cu_ee(1)));
+fprintf('Rotor copper loss of Energy Efficient motor under no-load conditions = %f W',abs(P2cu_ee(1)));
+
+% SE motor
+fprintf('Stator copper loss of Standard motor under no-load conditions = %f W',abs(P1cu_se(1)));
+fprintf('Rotor copper loss of Standard motor under no-load conditions = %f W',abs(P2cu_se(1)));
+%%
+% 6. Efficiency vs. speed characteristics
+disp('6. Efficiency vs. speed characteristics')
+
+% EE motor
+eff_ee = Pshaft_ee./Pin_ee;      % efficiency = Pout/Pin
+
+% SE motor
+eff_se = Pshaft_se./Pin_se;      % efficiency = Pout/Pin
+
+% Plot the characteristics
+plot(n,abs(eff_ee),n,abs(eff_se),'linewidth',2),xlabel('n [rpm]'),ylabel('Efficiency'),...
+    title('Efficiency vs speed'),grid on,...
+    %legend({'EE motor','SE motor'},'Location','best');
+%%
+% 6. (a) Efficiencies of machines at maximum torque
+disp('(a) Efficiencies of the motors at maximum torque')
 
 %%
+% 6. (b) Maximum efficiency of machines
+disp('(b) Maximum efficiency of machine')
 
-
-
+%fprintf('Maximum efficiency of Energy Efficient motor = %f',)
 %% 
 %
